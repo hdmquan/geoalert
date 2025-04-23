@@ -23,9 +23,10 @@ CREATE TABLE events (
   subcategory TEXT,
   status TEXT NOT NULL,
   location TEXT NOT NULL,
-  last_updated_timestamp TIMESTAMP NOT NULL,
+  formatted_address TEXT,
+  raw_address TEXT,
   geometry GEOMETRY(POINT, 4326),
-  formatted_address TEXT
+  last_updated_timestamp TIMESTAMP NOT NULL
 );
 
 CREATE TABLE alerts (
