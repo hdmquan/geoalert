@@ -14,10 +14,18 @@ CREATE TABLE zones (
   event_types TEXT[] NOT NULL
 );
 
+DROP TABLE IF EXISTS alerts;
+DROP TABLE IF EXISTS events;
+
 CREATE TABLE events (
   id SERIAL PRIMARY KEY,
-  event_type TEXT NOT NULL,
-  geometry GEOMETRY(POINT, 4326) NOT NULL
+  category TEXT NOT NULL,
+  subcategory TEXT,
+  status TEXT NOT NULL,
+  location TEXT NOT NULL,
+  last_updated_timestamp TIMESTAMP NOT NULL,
+  geometry GEOMETRY(POINT, 4326),
+  formatted_address TEXT
 );
 
 CREATE TABLE alerts (
