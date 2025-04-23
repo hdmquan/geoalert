@@ -4,30 +4,33 @@ import * as cheerio from "cheerio";
 
 const url = "https://emergency.vic.gov.au/public/textonly.html";
 
-function preprocessData(data) {
-    const cleaned = data.map((item) => {
-        // Normalize type
-        const typeParts = item.type
-            .split(" - ")
-            .map((part) => part.replace(/\s+/g, " ").trim());
+async function preprocessData(data) {
+    const data = await Promise.all(
+        data.map(async (item) => {
+            const typeParts = item.type
+                .split(" - ")
+                .map((part) => part.replace(/\s+/g, " ").trim());
 
-        let category = typeParts[0] || null;
-        let information = typeParts.slice(1).join(" - ") || null;
+            const category = typeParts[0] || null;
+            const subcategory = typeParts.slice(1).join(" - ") || null;
+            const location = item.location.replace(/\s+/g, " ").trim();
 
-        // Clear whitespace from location
-        const location = item.location.replace(/\s+/g, " ").trim();
+            const geo = await geocodeLocation(location);
 
-        return {
-            category,
-            information,
-            status: item.status,
-            location,
-            lastUpdatedTimestamp: item.lastUpdatedTimestamp,
-        };
-    });
+            return {
+                category,
+                subcategory,
+                status: item.status,
+                location,
+                lastUpdatedTimestamp: item.lastUpdatedTimestamp,
+                geometry: geo?.location || null,
+                formattedAddress: geo?.formattedAddress || null,
+            };
+        })
+    );
 
-    console.log(cleaned);
-    return cleaned;
+    console.log(data);
+    return data;
 }
 
 async function fetchData() {
