@@ -112,10 +112,6 @@ async function fetchData() {
     }
 }
 
-if (import.meta.url === process.argv[1]) {
-    cron.schedule("*/5 * * * *", fetchData)
-}
-
 // fetchData();
 
 export { fetchData, preprocessData, parseHtmlData }

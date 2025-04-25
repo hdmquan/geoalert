@@ -1,15 +1,11 @@
-const express = require("express")
-const app = express()
-const port = 5001
+import { fetchData } from "./src/fetcher.js"
+import cron from "node-cron"
 
-// Middleware to parse JSON
-app.use(express.json())
+console.log("Running GeoAlert background worker...")
 
-// Example route
-app.get("/api/hello", (req, res) => {
-    res.json({ message: "Hello from Node backend!" })
-})
+await fetchData()
 
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`)
+cron.schedule("*/5 * * * *", async () => {
+    console.log("Scheduled fetch...")
+    await fetchData()
 })
