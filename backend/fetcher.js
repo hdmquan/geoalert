@@ -8,6 +8,28 @@ const url = "https://emergency.vic.gov.au/public/textonly.html";
 const CACHE_KEY = "emergency_events";
 const CACHE_EXPIRY = 5 * 60;
 
+function parseHtmlData(htmlText) {
+    const $ = cheerio.load(htmlText);
+    const data = [];
+
+    $("#textonly-table tbody tr").each((i, elem) => {
+        const $row = $(elem);
+        const type = $row.find("td").eq(0).text().trim();
+        const status = $row.find("td").eq(1).text().trim();
+        const location = $row.find("td").eq(2).text().trim();
+        const lastUpdatedTimestamp = $row.find(".lastUpdated").text().trim();
+
+        data.push({
+            type,
+            status,
+            location,
+            lastUpdatedTimestamp,
+        });
+    });
+
+    return data;
+}
+
 async function preprocessData(data) {
     const processedData = await Promise.all(
         data.map(async (item) => {
@@ -59,26 +81,7 @@ async function fetchData() {
         });
 
         const htmlText = await response.text();
-        const $ = cheerio.load(htmlText);
-        const data = [];
-
-        $("#textonly-table tbody tr").each((i, elem) => {
-            const $row = $(elem);
-            const type = $row.find("td").eq(0).text().trim();
-            const status = $row.find("td").eq(1).text().trim();
-            const location = $row.find("td").eq(2).text().trim();
-            const lastUpdatedTimestamp = $row
-                .find(".lastUpdated")
-                .text()
-                .trim();
-
-            data.push({
-                type,
-                status,
-                location,
-                lastUpdatedTimestamp,
-            });
-        });
+        const data = parseHtmlData(htmlText);
 
         // Cache current batch
         await setCache(CACHE_KEY, data, CACHE_EXPIRY);
@@ -108,4 +111,4 @@ if (import.meta.url === process.argv[1]) {
 
 // fetchData();
 
-export { fetchData, preprocessData };
+export { fetchData, preprocessData, parseHtmlData };
