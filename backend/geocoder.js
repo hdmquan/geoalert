@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
-// const test_location = "Licola";
+const test_location = "Genoa River";
 
 export async function geocodeLocation(locationString) {
     const query = `${locationString}, Australia`;
@@ -40,4 +40,4 @@ export async function geocodeLocation(locationString) {
     }
 }
 
-// geocodeLocation(test_location);
+geocodeLocation(test_location);

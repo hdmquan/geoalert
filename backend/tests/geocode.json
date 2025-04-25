@@ -1,0 +1,29 @@
+{
+  "address_components": [
+    {
+      "long_name": "Genoa River",
+      "short_name": "Genoa River",
+      "types": ["establishment", "natural_feature"]
+    },
+    { 
+      "long_name": "Australia", 
+      "short_name": "AU", 
+      "types": ["country", "political"] 
+    }
+  ],
+  "formatted_address": "Genoa River, Australia",
+  "geometry": {
+    "bounds": { 
+      "northeast": {"lat": -37.1, "lng": 149.6}, 
+      "southwest": {"lat": -37.4, "lng": 149.3} 
+    },
+    "location": { "lat": -37.28553975528891, "lng": 149.4492725795698 },
+    "location_type": "APPROXIMATE",
+    "viewport": { 
+      "northeast": {"lat": -37.2, "lng": 149.5}, 
+      "southwest": {"lat": -37.3, "lng": 149.4} 
+    }
+  },
+  "place_id": "ChIJx9ir0gfrO2sRHtnXvr3M-1Q",
+  "types": [ "establishment", "natural_feature" ]
+}
