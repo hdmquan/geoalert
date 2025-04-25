@@ -1,4 +1,4 @@
-import { fetchData } from "./src/fetcher.js"
+import { fetchData } from "./fetcher.js"
 import cron from "node-cron"
 
 console.log("Running GeoAlert background worker...")

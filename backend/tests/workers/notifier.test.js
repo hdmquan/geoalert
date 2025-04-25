@@ -2,11 +2,11 @@ import { jest } from "@jest/globals"
 
 const mockQuery = jest.fn()
 
-jest.unstable_mockModule("../src/database.js", () => ({
+jest.unstable_mockModule("../../db/database.js", () => ({
     pool: { query: mockQuery }
 }))
 
-const { notifyUsers } = await import("../src/notifier.js")
+const { notifyUsers } = await import("../../workers/notifier.js")
 
 beforeEach(() => {
     mockQuery.mockReset()

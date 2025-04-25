@@ -1,8 +1,8 @@
 import cron from "node-cron"
 import fetch from "node-fetch"
 import * as cheerio from "cheerio"
-import { geocodeLocation } from "./geocoder.js"
-import { writeEvents, getCache, setCache } from "./database.js"
+import { geocodeLocation } from "../utils/geocoder.js"
+import { writeEvents, getCache, setCache } from "../db/database.js"
 import { notifyUsers } from "./notifier.js"
 
 const url = "https://emergency.vic.gov.au/public/textonly.html"

@@ -1,4 +1,4 @@
-import { pool } from "./database.js"
+import { pool } from "../db/database.js"
 
 /**
  * Check which users' zones intersect with the given events and send notifications

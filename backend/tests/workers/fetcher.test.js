@@ -7,18 +7,18 @@ const mockGetCache = jest.fn()
 const mockSetCache = jest.fn()
 const mockGeocodeLocation = jest.fn()
 
-jest.unstable_mockModule("../src/database.js", () => ({
+jest.unstable_mockModule("../../db/database.js", () => ({
     getCache: mockGetCache,
     setCache: mockSetCache,
     writeEvents: jest.fn(),
     pool: {}
 }))
 
-jest.unstable_mockModule("../src/geocoder.js", () => ({
+jest.unstable_mockModule("../../utils/geocoder.js", () => ({
     geocodeLocation: mockGeocodeLocation
 }))
 
-const { parseHtmlData, preprocessData } = await import("../src/fetcher.js")
+const { parseHtmlData, preprocessData } = await import("../../workers/fetcher.js")
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 beforeEach(() => {
