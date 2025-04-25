@@ -7,7 +7,7 @@ import { notifyUsers } from "./notifier.js"
 
 const url = "https://emergency.vic.gov.au/public/textonly.html"
 const CACHE_KEY = "emergency_events"
-const CACHE_EXPIRY = 6 * 60
+const CACHE_EXPIRY = 6 * 60 // in seconds
 
 function parseHtmlData(htmlText) {
     const $ = cheerio.load(htmlText)
@@ -31,19 +31,27 @@ function parseHtmlData(htmlText) {
     return data
 }
 
+function parseTimestamp(input) {
+    if (!input) return null
+
+    if (/^\d{13}$/.test(input)) {
+        const date = new Date(Number(input))
+        return isNaN(date.getTime()) ? null : date
+    }
+
+    const parsed = Date.parse(input)
+    return isNaN(parsed) ? null : new Date(parsed)
+}
+
 async function preprocessData(data) {
-    const processedData = await Promise.all(
+    const results = await Promise.all(
         data.map(async (item) => {
             const typeParts = item.type.split(" - ").map((part) => part.replace(/\s+/g, " ").trim())
-
             const category = typeParts[0] || null
             const subcategory = typeParts.slice(1).join(" - ") || null
             const location = item.location.replace(/\s+/g, " ").trim()
 
-            // Cache current location
             const locationCacheKey = `geo_${location.replace(/\s+/g, "_").toLowerCase()}`
-
-            // Cache first, else
             let geo = await getCache(locationCacheKey)
 
             if (!geo) {
@@ -53,26 +61,31 @@ async function preprocessData(data) {
                 }
             }
 
+            const parsedTimestamp = parseTimestamp(item.lastUpdatedTimestamp)
+            if (!(parsedTimestamp instanceof Date) || isNaN(parsedTimestamp)) {
+                console.warn("⚠️ Skipping event with invalid timestamp:", item.lastUpdatedTimestamp)
+                return null
+            }
+
             return {
                 category,
                 subcategory,
                 status: item.status,
                 location,
-                lastUpdatedTimestamp: item.lastUpdatedTimestamp,
+                lastUpdatedTimestamp: parsedTimestamp,
                 geometry: geo?.location || null,
                 formattedAddress: geo?.formattedAddress || null
             }
         })
     )
 
-    return processedData
+    return results.filter(Boolean) // remove skipped events
 }
 
 async function fetchData() {
     try {
         const cachedData = await getCache(CACHE_KEY)
 
-        // curl --compressed https://emergency.vic.gov.au/public/textonly.html
         const response = await fetch(url, {
             headers: {
                 "Accept-Encoding": "gzip, deflate, br"
@@ -82,7 +95,6 @@ async function fetchData() {
         const htmlText = await response.text()
         const data = parseHtmlData(htmlText)
 
-        // Cache current batch
         await setCache(CACHE_KEY, data, CACHE_EXPIRY)
 
         if (cachedData && JSON.stringify(cachedData) === JSON.stringify(data)) {
@@ -90,7 +102,6 @@ async function fetchData() {
             return
         }
 
-        // Process if changed
         const processedData = await preprocessData(data)
         const results = await writeEvents(processedData)
 
@@ -100,7 +111,6 @@ async function fetchData() {
             unchanged: results.filter((r) => r.unchanged).length
         })
 
-        // Notify
         const eventsToNotify = results.filter((event) => event.created || event.updated)
 
         if (eventsToNotify.length > 0) {
@@ -112,6 +122,6 @@ async function fetchData() {
     }
 }
 
-// fetchData();
+// fetchData()
 
 export { fetchData, preprocessData, parseHtmlData }

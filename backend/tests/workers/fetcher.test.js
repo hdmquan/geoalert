@@ -49,7 +49,7 @@ test("preprocessData correctly processes event data with geocoding", async () =>
             type: "Watch and Act - Met - Avoid the Flooded Area",
             status: "Moderate",
             location: "Genoa River",
-            lastUpdatedTimestamp: "Today at 12:21 PM"
+            lastUpdatedTimestamp: "2025-04-25T12:21:00"
         }
     ]
 
