@@ -8,7 +8,7 @@
         "dev": "nodemon server.js",
         "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
         "lint-check": "prettier --check .",
-        "lint-fix": "prettier --write ."
+        "lint": "prettier --write ."
     },
     "keywords": [],
     "author": "",
