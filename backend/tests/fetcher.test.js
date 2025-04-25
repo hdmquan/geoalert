@@ -10,7 +10,8 @@ const mockGeocodeLocation = jest.fn()
 jest.unstable_mockModule("../src/database.js", () => ({
     getCache: mockGetCache,
     setCache: mockSetCache,
-    writeEvents: jest.fn()
+    writeEvents: jest.fn(),
+    pool: {}
 }))
 
 jest.unstable_mockModule("../src/geocoder.js", () => ({

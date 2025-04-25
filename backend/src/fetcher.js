@@ -3,10 +3,11 @@ import fetch from "node-fetch"
 import * as cheerio from "cheerio"
 import { geocodeLocation } from "./geocoder.js"
 import { writeEvents, getCache, setCache } from "./database.js"
+import { notifyUsers } from "./notifier.js"
 
 const url = "https://emergency.vic.gov.au/public/textonly.html"
 const CACHE_KEY = "emergency_events"
-const CACHE_EXPIRY = 5 * 60
+const CACHE_EXPIRY = 6 * 60
 
 function parseHtmlData(htmlText) {
     const $ = cheerio.load(htmlText)
@@ -98,6 +99,14 @@ async function fetchData() {
             updated: results.filter((r) => r.updated).length,
             unchanged: results.filter((r) => r.unchanged).length
         })
+
+        // Notify
+        const eventsToNotify = results.filter((event) => event.created || event.updated)
+
+        if (eventsToNotify.length > 0) {
+            console.log(`Sending notifications for ${eventsToNotify.length} new/updated events`)
+            await notifyUsers(eventsToNotify)
+        }
     } catch (error) {
         console.error("Error fetching data:", error)
     }
