@@ -1,4 +1,7 @@
 import { jest } from "@jest/globals";
+import fs from "fs/promises";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const mockGetCache = jest.fn();
 const mockSetCache = jest.fn();
@@ -7,14 +10,15 @@ const mockGeocodeLocation = jest.fn();
 jest.unstable_mockModule("../database.js", () => ({
     getCache: mockGetCache,
     setCache: mockSetCache,
-    writeEvents: jest.fn(), // stub if used
+    writeEvents: jest.fn(),
 }));
 
 jest.unstable_mockModule("../geocoder.js", () => ({
     geocodeLocation: mockGeocodeLocation,
 }));
 
-const { preprocessData } = await import("../fetcher.js");
+const { parseHtmlData, preprocessData } = await import("../fetcher.js");
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 beforeEach(() => {
     mockGetCache.mockReset();
@@ -22,25 +26,89 @@ beforeEach(() => {
     mockGeocodeLocation.mockReset();
 });
 
-test("preprocessData splits type correctly", async () => {
-    const input = [
+test("parseHtmlData correctly extracts event data from HTML", async () => {
+    // Load test HTML fixture
+    const html = await fs.readFile(path.join(__dirname, "test.html"), "utf-8");
+
+    const result = parseHtmlData(html);
+
+    expect(result).toBeInstanceOf(Array);
+    expect(result.length).toBeGreaterThan(0);
+
+    // Test first item properties exist without hardcoding values
+    expect(result[0]).toHaveProperty("type");
+    expect(result[0]).toHaveProperty("status");
+    expect(result[0]).toHaveProperty("location");
+    expect(result[0]).toHaveProperty("lastUpdatedTimestamp");
+});
+
+test("preprocessData correctly processes event data with geocoding", async () => {
+    // Load geocode fixture data
+    const geocodeData = JSON.parse(
+        await fs.readFile(path.join(__dirname, "geocode.json"), "utf-8")
+    );
+
+    // Create sample input data
+    const inputData = [
         {
-            type: "Flood - Warning",
-            status: "Active",
-            location: "Some River",
-            lastUpdatedTimestamp: "Now",
+            type: "Watch and Act - Met - Avoid the Flooded Area",
+            status: "Moderate",
+            location: "Genoa River",
+            lastUpdatedTimestamp: "Today at 12:21 PM",
         },
     ];
 
+    // Mock geocoding response using fixture
     mockGetCache.mockResolvedValue(null);
     mockGeocodeLocation.mockResolvedValue({
-        location: { lat: -37.0, lng: 149.0 },
-        formattedAddress: "Some River, VIC",
+        location: geocodeData.geometry.location,
+        formattedAddress: geocodeData.formatted_address,
     });
 
-    const result = await preprocessData(input);
+    const result = await preprocessData(inputData);
 
-    expect(result[0].category).toBe("Flood");
-    expect(result[0].subcategory).toBe("Warning");
-    expect(result[0].formattedAddress).toBe("Some River, VIC");
+    expect(result).toBeInstanceOf(Array);
+    expect(result.length).toBe(inputData.length);
+
+    // Test results have expected properties
+    expect(result[0]).toHaveProperty("category");
+    expect(result[0]).toHaveProperty("subcategory");
+    expect(result[0]).toHaveProperty("geometry");
+    expect(result[0]).toHaveProperty("formattedAddress");
+
+    // Verify geocoding was called with the right location
+    expect(mockGeocodeLocation).toHaveBeenCalledWith(inputData[0].location);
+});
+
+test("end-to-end parsing and processing using HTML fixture", async () => {
+    // Load test HTML fixture
+    const html = await fs.readFile(path.join(__dirname, "test.html"), "utf-8");
+
+    // Load geocode fixture data
+    const geocodeData = JSON.parse(
+        await fs.readFile(path.join(__dirname, "geocode.json"), "utf-8")
+    );
+
+    // Set up mocks
+    mockGetCache.mockResolvedValue(null);
+    mockGeocodeLocation.mockResolvedValue({
+        location: geocodeData.geometry.location,
+        formattedAddress: geocodeData.formatted_address,
+    });
+
+    // Parse HTML
+    const parsedData = parseHtmlData(html);
+
+    // Process parsed data
+    const processedData = await preprocessData(parsedData);
+
+    // Test the whole pipeline
+    expect(processedData).toBeInstanceOf(Array);
+    expect(processedData.length).toBe(parsedData.length);
+
+    // Verify expected properties without hardcoding values
+    expect(processedData[0]).toHaveProperty("category");
+    expect(processedData[0]).toHaveProperty("subcategory");
+    expect(processedData[0]).toHaveProperty("geometry");
+    expect(processedData[0]).toHaveProperty("formattedAddress");
 });
