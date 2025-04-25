@@ -1,10 +1,28 @@
 import request from "supertest"
 import { pool } from "../../db/database.js"
 import app from "../../api/server.js"
+import dotenv from "dotenv"
+dotenv.config()
 
 const testEmail = `test+${Date.now()}@example.com`
 const testPassword = "password123"
 const testName = "Test User"
+
+console.log({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    db: process.env.DB_NAME
+})
+
+beforeAll(async () => {
+    const client = await pool.connect()
+    const { rows } = await client.query(
+        "SELECT current_database(), inet_server_addr(), inet_server_port()"
+    )
+    console.log("✅ Connected to DB:", rows[0])
+    client.release()
+})
 
 describe("Auth API", () => {
     afterAll(async () => {
