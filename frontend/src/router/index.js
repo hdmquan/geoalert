@@ -12,7 +12,11 @@ const routes = [
     {
         path: "/app",
         name: "Dashboard",
-        component: Dashboard
+        component: Dashboard,
+        meta: {
+            requiresAuth: true,
+            layout: "dashboard"
+        }
     },
     {
         path: "/login",
