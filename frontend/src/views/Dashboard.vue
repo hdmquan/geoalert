@@ -79,23 +79,23 @@ onMounted(() => {
         to="/history" 
         class="block sm:hidden text-theme-primary"
       >
-        <img src="@/assets/svgs/history-svgrepo-com.svg" alt="History" class="w-6 h-6">
+        <img src="@/assets/svgs/history-svgrepo-com.svg" alt="History" class="w-6 h-6 filter transition-transform duration-300 hover:scale-125">
       </router-link>
     </div>
 
     <!-- Sidebar -->
     <div class="absolute top-14 left-0 w-16 h-[calc(100vh-3.5rem)] bg-white shadow flex flex-col items-center py-4 space-y-4 z-10">
-      <button @click="switchToPanMode" class="hover:bg-theme-primary hover:text-white p-2 rounded">
-        <img src="@/assets/svgs/halt-svgrepo-com.svg" alt="Pan" class="w-6 h-6">
+      <button @click="switchToPanMode" class="hover:text-white p-2 rounded">
+        <img src="@/assets/svgs/halt-svgrepo-com.svg" alt="Pan" class="w-6 h-6 filter transition-transform duration-300 hover:scale-125">
       </button>
-      <button @click="switchToDrawMode" class="hover:bg-theme-primary hover:text-white p-2 rounded">
-        <img src="@/assets/svgs/edit-svgrepo-com.svg" alt="Edit" class="w-6 h-6">
+      <button @click="switchToDrawMode" class="hover:text-white p-2 rounded">
+        <img src="@/assets/svgs/edit-svgrepo-com.svg" alt="Edit" class="w-6 h-6 filter transition-transform duration-300 hover:scale-125">
       </button>
-      <button @click="deleteAll" class="hover:bg-theme-primary hover:text-white p-2 rounded">
-        <img src="@/assets/svgs/trash-svgrepo-com.svg" alt="Delete" class="w-6 h-6">
+      <button @click="deleteAll" class="hover:text-white p-2 rounded">
+        <img src="@/assets/svgs/trash-svgrepo-com.svg" alt="Delete" class="w-6 h-6 filter transition-transform duration-300 hover:scale-125">
       </button>
-      <button @click="savePolygon" class="hover:bg-theme-primary hover:text-white p-2 rounded block sm:hidden">
-        <img src="@/assets/svgs/save-svgrepo-com.svg" alt="Save" class="w-6 h-6">
+      <button @click="savePolygon" class="hover:text-white p-2 rounded block sm:hidden">
+        <img src="@/assets/svgs/save-svgrepo-com.svg" alt="Save" class="w-6 h-6 filter transition-transform duration-300 hover:scale-125">
       </button>
     </div>
 
