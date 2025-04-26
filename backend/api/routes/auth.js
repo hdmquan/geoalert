@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken"
 import { pool } from "../../db/database.js"
 
 const router = express.Router()
-const SECRET = process.env.JWT_SECRET || "changeme"
+const SECRET = process.env.JWT_SECRET
 
 router.post("/signup", async (req, res) => {
     const { email, password, name } = req.body

@@ -9,8 +9,12 @@ const port = process.env.PORT || 5001
 app.use(cors())
 app.use(express.json())
 
-app.use("/api", authRoutes)
-app.use("/api", zoneRoutes)
+app.use("/api/auth", authRoutes)
+app.use("/api/zones", zoneRoutes)
+
+app.get("/", (req, res) => {
+    res.send("Backend API is running 🚀")
+})
 
 app.listen(port, () => {
     console.log(`API server listening on port ${port}`)
