@@ -6,6 +6,14 @@ import { pool } from "../../db/database.js"
 const router = express.Router()
 const SECRET = process.env.JWT_SECRET
 
+router.get("/", (req, res) => {
+    res.send("Auth API is running pwd: /auth")
+})
+
+router.get("/signup", (req, res) => {
+    res.send("Auth API is running pwd: /auth/signup")
+})
+
 router.post("/signup", async (req, res) => {
     const { email, password, name } = req.body
     const hashed = await bcrypt.hash(password, 10)
@@ -24,6 +32,10 @@ router.post("/signup", async (req, res) => {
         console.error(err)
         res.status(500).json({ error: "Internal error" })
     }
+})
+
+router.get("/login", (req, res) => {
+    res.send("Auth API is running pwd: /auth/login")
 })
 
 router.post("/login", async (req, res) => {
@@ -45,4 +57,5 @@ router.post("/login", async (req, res) => {
     }
 })
 
+console.log("[DEBUG] authRoutes loaded")
 export default router
