@@ -5,10 +5,10 @@ import cors from "cors"
 
 const app = express()
 
-// app.use((req, res, next) => {
-//     console.log(`[DEBUG] Incoming request:`, req.method, req.url)
-//     next()
-// })
+app.use((req, res, next) => {
+    console.log(`[DEBUG] Incoming request:`, req.method, req.url)
+    next()
+})
 
 const port = process.env.PORT || 5001
 
