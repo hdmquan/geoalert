@@ -1,5 +1,4 @@
 <script setup>
-// Home page component
 </script>
 
 <template>
@@ -31,5 +30,4 @@
 </template>
 
 <style scoped>
-/* Custom styles for Home page if needed */
 </style>
