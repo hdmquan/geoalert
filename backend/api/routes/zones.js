@@ -10,24 +10,40 @@ router.get("/ping", (req, res) => {
 
 router.get("/", auth, async (req, res) => {
     const { rows } = await pool.query(
-        "SELECT id, ST_AsGeoJSON(geometry) AS geometry, event_types FROM zones WHERE user_id = $1",
+        "SELECT id, ST_AsGeoJSON(geometry) AS geometry FROM zones WHERE user_id = $1",
         [req.user.userId]
     )
     res.json(rows)
 })
 
 router.post("/", auth, async (req, res) => {
-    const { geometry, event_types } = req.body
+    const { geometry } = req.body
 
     try {
+        // Log the incoming request body for debugging
+        console.log("Received geometry:", geometry)
+        console.log("User ID:", req.user.userId)
+
+        // Attempt to insert into the database
         await pool.query(
-            "INSERT INTO zones (user_id, geometry, event_types) VALUES ($1, ST_SetSRID(ST_GeomFromGeoJSON($2), 4326), $3)",
-            [req.user.userId, JSON.stringify(geometry), event_types]
+            "INSERT INTO zones (user_id, geometry) VALUES ($1, ST_SetSRID(ST_GeomFromGeoJSON($2), 4326))",
+            [req.user.userId, JSON.stringify(geometry)]
         )
         res.status(201).json({ message: "Zone saved" })
     } catch (err) {
-        console.error(err)
-        res.status(500).json({ error: "Failed to save zone" })
+        // Log the full error stack and relevant context
+        console.error("Error saving zone:", err)
+        console.error("Request body:", req.body)
+        console.error("User ID:", req.user ? req.user.userId : "No user")
+
+        // Send detailed error info in response (for development only)
+        res.status(500).json({
+            error: "Failed to save zone",
+            message: err.message,
+            stack: err.stack,
+            requestBody: req.body,
+            userId: req.user ? req.user.userId : null
+        })
     }
 })
 

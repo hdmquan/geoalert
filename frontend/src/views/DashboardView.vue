@@ -15,7 +15,7 @@ const savePolygon = async () => {
     const data = draw.value.getAll()
 
     console.log("Polygon data:", data)
-    
+
     let geometry = null
 
     if (data.features.length > 0) {
@@ -27,8 +27,7 @@ const savePolygon = async () => {
         await axios.post(
             "/api/zones",
             {
-                geometry,
-                event_types: []
+                geometry
             },
             {
                 headers: {
