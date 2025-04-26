@@ -32,7 +32,7 @@ describe("Auth API", () => {
     })
 
     test("signup creates a new user", async () => {
-        const res = await request(app).post("/api/signup").send({
+        const res = await request(app).post("/api/auth/signup").send({
             name: testName,
             email: testEmail,
             password: testPassword
@@ -44,7 +44,7 @@ describe("Auth API", () => {
 
     test("signup fails for duplicate email", async () => {
         // Run once more with same email
-        const res = await request(app).post("/api/signup").send({
+        const res = await request(app).post("/api/auth/signup").send({
             name: testName,
             email: testEmail,
             password: testPassword
@@ -55,7 +55,7 @@ describe("Auth API", () => {
     })
 
     test("login returns a valid token", async () => {
-        const res = await request(app).post("/api/login").send({
+        const res = await request(app).post("/api/auth/login").send({
             email: testEmail,
             password: testPassword
         })
@@ -66,7 +66,7 @@ describe("Auth API", () => {
     })
 
     test("login fails with incorrect password", async () => {
-        const res = await request(app).post("/api/login").send({
+        const res = await request(app).post("/api/auth/login").send({
             email: testEmail,
             password: "wrong-password"
         })
@@ -76,7 +76,7 @@ describe("Auth API", () => {
     })
 
     test("login fails with nonexistent email", async () => {
-        const res = await request(app).post("/api/login").send({
+        const res = await request(app).post("/api/auth/login").send({
             email: "ghost@void.com",
             password: "anything"
         })
