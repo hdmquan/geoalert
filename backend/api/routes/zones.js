@@ -4,7 +4,11 @@ import auth from "../middleware/auth.js"
 
 const router = express.Router()
 
-router.get("/zones", auth, async (req, res) => {
+router.get("/ping", (req, res) => {
+    res.send("Zones API is running pwd: /zones/ping")
+})
+
+router.get("/", auth, async (req, res) => {
     const { rows } = await pool.query(
         "SELECT id, ST_AsGeoJSON(geometry) AS geometry, event_types FROM zones WHERE user_id = $1",
         [req.user.userId]
@@ -12,7 +16,7 @@ router.get("/zones", auth, async (req, res) => {
     res.json(rows)
 })
 
-router.post("/zones", auth, async (req, res) => {
+router.post("/", auth, async (req, res) => {
     const { geometry, event_types } = req.body
 
     try {

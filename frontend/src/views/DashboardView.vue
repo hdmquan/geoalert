@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue"
 import mapboxgl from "mapbox-gl"
 import MapboxDraw from "@mapbox/mapbox-gl-draw"
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css"
+import axios from "axios"
 
 const mapContainer = ref(null)
 const draw = ref(null)
@@ -12,16 +13,34 @@ const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_API_KEY
 
 const savePolygon = async () => {
     const data = draw.value.getAll()
-    if (data.features.length === 0) {
-        alert("No polygon drawn!")
-        return
+
+    console.log("Polygon data:", data)
+    
+    let geometry = null
+
+    if (data.features.length > 0) {
+        geometry = data.features[0].geometry
     }
 
-    const polygon = data.features[0]
-    console.log("Polygon to save:", polygon)
-
-    // TODO: real backend POST call
-    alert("Polygon saved! (Check console for data)")
+    try {
+        const token = localStorage.getItem("token")
+        await axios.post(
+            "/api/zones",
+            {
+                geometry,
+                event_types: []
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        )
+        alert("Polygon saved!")
+    } catch (err) {
+        console.error(err)
+        alert(err.response?.data?.error || "Failed to save polygon")
+    }
 }
 
 const switchToPanMode = () => {
