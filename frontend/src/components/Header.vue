@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
+import Button from './Button.vue'
 
 const router = useRouter()
 const links = computed(() => router.options.routes.filter(r => r.name !== 'Login'))
@@ -10,6 +11,8 @@ const currentPath = computed(() => router.currentRoute.value.path)
 const { user, isLoggedIn, logout } = useAuth()
 
 const goLogin = () => router.push('/login')
+const goDashboard = () => router.push('/dashboard')
+
 </script>
 
 <template>
@@ -28,13 +31,10 @@ const goLogin = () => router.push('/login')
                             </router-link>
                         </li>
                         <li v-if="isLoggedIn">
-                            <span class="text-gray-700">Hello, {{ user.name }}</span>
-                            <button @click="logout" class="ml-2 text-sm text-red-500 hover:underline">Logout</button>
+                            <Button btnType="primary" @click="goDashboard">Dashboard</Button>
                         </li>
                         <li v-else>
-                            <button @click="goLogin" class="text-theme-primary border border-theme-primary px-3 py-1 rounded hover:bg-theme-primary hover:text-white">
-                                Sign In
-                            </button>
+                            <Button btnType="primary" @click="goLogin">Sign In</Button>
                         </li>
                     </ul>
                 </div>

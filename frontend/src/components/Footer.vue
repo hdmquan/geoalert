@@ -17,14 +17,6 @@
                 <div class="flex justify-between items-center h-16">
                     <router-link to="/" class="text-xl font-bold text-theme-primary">GeoAlert</router-link>
                     <ul class="flex space-x-6">
-                        <li v-for="link in links" :key="link.name">
-                            <router-link 
-                                :to="link.path"
-                                class="text-gray-600 hover:text-theme-primary transition-colors" 
-                                :class="{ 'text-theme-primary font-medium': link.path === currentPath }">
-                                {{ link.name }}
-                            </router-link>
-                        </li>
                     </ul>
                 </div>
             </div>
