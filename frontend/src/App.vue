@@ -1,14 +1,17 @@
 <script setup>
-import Header from './layouts/Header.vue';
-import Footer from './layouts/Footer.vue';
+import { useRoute } from "vue-router"
+import HeaderComponent from "./components/HeaderComponent.vue"
+import FooterComponent from "./components/FooterComponent.vue"
+
+const route = useRoute()
 </script>
 
 <template>
-    <Header/>
+    <HeaderComponent v-if="route.meta.layout !== 'dashboard'" />
 
-    <router-view/>
+    <router-view />
 
-    <Footer />
+    <FooterComponent v-if="route.meta.layout !== 'dashboard'" />
 </template>
 
 <style scoped></style>
