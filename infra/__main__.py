@@ -22,6 +22,15 @@ public_subnet = aws.ec2.Subnet(
     availability_zone=f"{region}a",
 )
 
+# Add a second subnet in a different AZ for RDS
+public_subnet_2 = aws.ec2.Subnet(
+    "public-subnet-2",
+    vpc_id=vpc.id,
+    cidr_block="10.0.2.0/24",
+    map_public_ip_on_launch=True,
+    availability_zone=f"{region}b",
+)
+
 # Internet Gateway
 igw = aws.ec2.InternetGateway("igw", vpc_id=vpc.id)
 
@@ -98,12 +107,18 @@ backend_repo = aws.ecr.Repository("backend-repo")
 # S3 Bucket for init SQL
 init_sql_bucket = aws.s3.Bucket("init-sql-bucket")
 
-# RDS Postgres (single AZ, free tier eligible)
+# RDS Postgres
+db_subnet_group = aws.rds.SubnetGroup(
+    "geoalert-db-subnet-group",
+    subnet_ids=[public_subnet.id, public_subnet_2.id],
+    tags={"Name": "geoalert-db-subnet-group"},
+)
+
 db = aws.rds.Instance(
     "geoalert-db",
     allocated_storage=20,
     engine="postgres",
-    engine_version="15.3",
+    engine_version="17.2",
     instance_class="db.t3.micro",
     db_name="geoalert",
     username="postgres",
@@ -111,10 +126,16 @@ db = aws.rds.Instance(
     publicly_accessible=False,
     vpc_security_group_ids=[web_sg.id],
     skip_final_snapshot=True,
-    db_subnet_group_name=None,
+    db_subnet_group_name=db_subnet_group.name,
 )
 
 # ElastiCache Redis (single node, cheapest config)
+redis_subnet_group = aws.elasticache.SubnetGroup(
+    "redis-subnet-group",
+    subnet_ids=[public_subnet.id],
+    description="Subnet group for Redis in custom VPC",
+)
+
 redis = aws.elasticache.Cluster(
     "redis-cluster",
     engine="redis",
@@ -122,6 +143,7 @@ redis = aws.elasticache.Cluster(
     num_cache_nodes=1,
     security_group_ids=[web_sg.id],
     parameter_group_name="default.redis7",
+    subnet_group_name=redis_subnet_group.name,
 )
 
 pulumi.export("vpc_id", vpc.id)
